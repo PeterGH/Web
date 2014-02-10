@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title>JavaScript Shell</title>
+    <hta:application 
+        id="JavaScriptShell" 
+        applicationname="JavaScript Shell"
+        border="thick"
+        borderstyle="complex"
+        caption="yes"
+        contextmenu="yes"
+        innerborder="yes"
+        maximizebutton="yes"
+        minimizebutton="yes"
+        navigable="no"
+        scroll="auto"
+        scrollflat="no"
+        selection="yes"
+        singleinstance="no"
+        sysmenu="yes"
+        windowstate="normal"/>
+    <script type="text/javascript">
+    <!--
+        var oShell = new ActiveXObject("WScript.Shell");
+        var oFSO = new ActiveXObject("Scripting.FileSystemObject");
+
+        function New() {
+            this.Input.value = "";
+        }
+
+        function OpenFile() {
+            var file = this.Open.value;
+            if (oFSO.FileExists(file)) {
+                var fs = oFSO.OpenTextFile(file, 1);
+                this.Input.value = "";
+                while (!fs.AtEndOfStream) {
+                    var line = fs.ReadLine();
+                    this.Input.value += line + "\n";
+                }
+            }
+        }
+
+        function CreateTempFile() {
+            var currentFolder = oFSO.GetFolder(oShell.CurrentDirectory);
+            var tempName = oFSO.GetTempName();
+            tempName += ".js";
+            var tempFile = oFSO.BuildPath(currentFolder, tempName);
+            return tempFile;
+        }
+
+        function SaveToFile(tempName) {
+            var tempFile = oFSO.CreateTextFile(tempName, true);
+            var lines = this.Input.value.split("\n");
+            for (var i = 0; i < lines.length; i++) {
+                tempFile.WriteLine(lines[i]);
+            }
+            tempFile.Close();
+        }
+
+        function Run() {
+            var input = this.Input.value;
+            if (document.selection) {
+                this.Input.focus();
+                var selected = document.selection.createRange();
+                if (selected.text != "") {
+                    input = selected.text;
+                }
+            }
+            var result = eval(input);
+            this.Output.value = result + "\n";
+        }
+
+        function KeyUp() {
+            if (event.keyCode == 112) {
+                // F1
+                Run();                
+            }
+        }
+
+        function Save() {
+            var oDlg = new ActiveXObject("MSComDlg.CommonDialog");
+            oDlg.MaxFileSize = 260;
+            if (this.Open.value) {
+                oDlg.FileName = this.Open.value;
+            } else {
+                oDlg.FileName = CreateTempFile();
+            }
+            oDlg.ShowSave();
+            if (oDlg.FileName) {
+                SaveToFile(oDlg.FileName);
+                this.Open.value = oDlg.FileName;
+            }
+            oDlg = null;
+        }
+    //-->
+    </script>
+</head>
+<body>
+    <button id="New" onclick="New()">New</button>
+    <input id="Open" type="file" onchange="OpenFile()" />
+    <button id="Save" onclick="Save()">Save</button>
+    <button id="Run" onclick="Run()">Run (F1)</button>
+    <table style="width:100%;">
+        <tr>
+            <td><textarea id="Input" name="Input" style="width:100%; background-color: #000000; color: #FFFFFF;" rows="40" onkeyup="KeyUp()"></textarea></td>
+            <td><textarea id="Output" name="Output" style="width:100%; background-color: #000000; color: #FFFFFF;" rows="40"></textarea></td>
+        </tr>
+    </table>
+</body>
+</html>
