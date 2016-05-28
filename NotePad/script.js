@@ -1,10 +1,13 @@
 var editor = document.getElementById("editor");
+var matchResult = document.getElementById("match");
 
 function resize() {
     var width = window.innerWidth;
     var height = window.innerHeight - 20;
     editor.style.width = width + "px";
     editor.style.height = height + "px";
+    // matchResult.style.width = "400px";
+    // matchResult.style.height = height + "px";
 }
 
 window.onload = resize;
@@ -96,3 +99,32 @@ function saveFile(e) {
 }
 
 document.getElementById("save").addEventListener("click", saveFile);
+
+var pattern = document.getElementById("pattern");
+var regex;
+
+pattern.addEventListener(
+    "keyup",
+    function () {
+        if (this.value == "") {
+            matchResult.style.display = "none";
+            resize();
+        } else {
+            regex = new RegExp(this.value);
+            var match = regex.exec(editor.value);
+            matchResult.value = "";
+            if (match != null) {
+                console.log(match);
+                for (var m in match) {
+                    matchResult.value += match[m] + "\n";
+                }
+                var width = window.innerWidth - 200;
+                var height = window.innerHeight - 20;
+                editor.style.width = width + "px";
+                editor.style.height = height + "px";
+                matchResult.style.height = height + "px";
+                matchResult.style.display = "inline";
+            }
+        }
+    }
+);

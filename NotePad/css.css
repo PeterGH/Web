@@ -8,5 +8,14 @@
 #editor {
     width : 100%;
     border-style : none;
-    background-color : white;
+    color : white;
+    background-color : black;
+}
+
+#match {
+    width : auto;
+    border-style : none;
+    display : none;
+    color : white;
+    background-color : black;
 }

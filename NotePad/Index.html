@@ -6,10 +6,15 @@
     <link rel="stylesheet" type="text/css" href="css.css" />
 </head>
 <body>
-    <input id="input" type="file" />
-    <input id="save" type="button" value="Save" />
-    <textarea id="editor" autofocus></textarea>
-    <label id="label"></label>
+    <div>
+        <input id="input" type="file" />
+        <input id="save" type="button" value="Save" />
+        <label for="pattern">Pattern:</label><input id="pattern" type="text" />
+    </div>
+    <div>
+        <textarea id="editor" autofocus></textarea>
+        <textarea id="match"></textarea>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
