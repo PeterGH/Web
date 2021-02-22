@@ -3,6 +3,7 @@
     <head>
         <title>Finance</title>
         <script src="jquery-3.5.1.js"></script>
+        <script src="Chart.bundle.js"></script>
         <style>
             table, th, td {
                 border: 1px solid black;
@@ -24,6 +25,9 @@
             <p id="compoundRate"></p>
             <p id="result"></p>
         </div>
+        <div>
+            <canvas id="chart" style="border: 1px solid #000000;"></canvas>
+        </div>
         <div id="table">
 
         </div>
@@ -32,14 +36,16 @@ function compoundRate(rate, periods) {
     return Math.pow(1 + rate, periods);
 }
 
-function compound(principal, rate, periods) {
+function compound(principal, rate, numPeriods) {
+    var periods = [];
     var rates = [];
     var interests = [];
     var balances = []
     var r = 1;
     var i = 0;
     var b = 0;
-    for (var p = 1; p <= periods; p++) {
+    for (var p = 1; p <= numPeriods; p++) {
+        periods.push(p);
         r *= (1 + rate);
         b = principal * r;
         i = b - principal;
@@ -47,7 +53,7 @@ function compound(principal, rate, periods) {
         balances.push(b);
         interests.push(i);
     }
-    return { rates, balances, interests };
+    return { periods, rates, balances, interests };
 }
 
 $(document).ready(function(){
@@ -55,10 +61,44 @@ $(document).ready(function(){
         e.preventDefault();
         var principal = Number($("#principal").val());
         var interestRate = Number($("#interestRate").val());
-        var periods = Number($("#periods").val());
+        var numPeriods = Number($("#periods").val());
         $("#pprincipal").text("Principal: " + principal);
-        $("#compoundRate").text("Compound Rate: " + compoundRate(interestRate, periods));
-        let { rates, balances, interests } = compound(principal, interestRate, periods);
+        $("#compoundRate").text("Compound Rate: " + compoundRate(interestRate, numPeriods));
+        let { periods, rates, balances, interests } = compound(principal, interestRate, numPeriods);
+
+        var ctx = document.getElementById("chart").getContext("2d");
+        var chart = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: periods,
+                datasets: [
+                    {
+                        label: "Rate",
+                        data: rates
+                    },
+                    {
+                        label: "Balance",
+                        data: balances
+                    },
+                    {
+                        label: "Interest",
+                        data: interests
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [
+                        {
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+
         $table = $("<table></table>");
         $table.append("<tr><th>Period</th><th>Rate</th><th>Balance</th><th>Interest</th></tr");
         for (var i = 0; i < rates.length; i++) {
