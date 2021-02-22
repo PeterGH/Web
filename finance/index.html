@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Finance</title>
+        <script src="jquery-3.5.1.js"></script>
+        <style>
+            table, th, td {
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <label for="principal">Principal:</label>
+            <input id="principal" name="principal" type="number"><br>
+            <label for="interestRate">Interest Rate:</label>
+            <input id="interestRate" name="interestRate" type="number"><br>
+            <label for="periods">Periods:</label>
+            <input id="periods" name="periods" type="number"><br>
+            <input id="calculate" type="button" value="Calculate">
+        </div>
+        <div>
+            <p id="pprincipal"></p>
+            <p id="compoundRate"></p>
+            <p id="result"></p>
+        </div>
+        <div id="table">
+
+        </div>
+        <script>
+function compoundRate(rate, periods) {
+    return Math.pow(1 + rate, periods);
+}
+
+function compound(principal, rate, periods) {
+    var rates = [];
+    var interests = [];
+    var balances = []
+    var r = 1;
+    var i = 0;
+    var b = 0;
+    for (var p = 1; p <= periods; p++) {
+        r *= (1 + rate);
+        b = principal * r;
+        i = b - principal;
+        rates.push(r);
+        balances.push(b);
+        interests.push(i);
+    }
+    return { rates, balances, interests };
+}
+
+$(document).ready(function(){
+    $("#calculate").click(function(e){
+        e.preventDefault();
+        var principal = Number($("#principal").val());
+        var interestRate = Number($("#interestRate").val());
+        var periods = Number($("#periods").val());
+        $("#pprincipal").text("Principal: " + principal);
+        $("#compoundRate").text("Compound Rate: " + compoundRate(interestRate, periods));
+        let { rates, balances, interests } = compound(principal, interestRate, periods);
+        $table = $("<table></table>");
+        $table.append("<tr><th>Period</th><th>Rate</th><th>Balance</th><th>Interest</th></tr");
+        for (var i = 0; i < rates.length; i++) {
+            $table.append("<tr><td>" + (i + 1) + "</td><td>" + rates[i] + "</td><td>" + balances[i] + "</td><td>" + interests[i] + "</td></td>");
+        }
+        $("#table").empty().append($table);
+    });
+});
+        </script>
+    </body>
+</html>
