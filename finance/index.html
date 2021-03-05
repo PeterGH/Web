@@ -8,6 +8,11 @@
             table, th, td {
                 border: 1px solid black;
             }
+            canvas {
+                border: 1px solid black;
+                width: 400px;
+                height: 300px;
+            }
         </style>
     </head>
     <body>
@@ -25,8 +30,7 @@
             <p id="compoundRate"></p>
             <p id="result"></p>
         </div>
-        <div>
-            <canvas id="chart" style="border: 1px solid #000000;"></canvas>
+        <div id="charts">
         </div>
         <div id="table">
 
@@ -56,6 +60,29 @@ function compound(principal, rate, numPeriods) {
     return { periods, rates, balances, interests };
 }
 
+function newChart(context, xlabels, data, label) {
+    var chart = new Chart(context, {
+        type: "line",
+        data: {
+            labels: xlabels,
+            datasets: [{
+                label: label,
+                data: data
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+}
+
 $(document).ready(function(){
     $("#calculate").click(function(e){
         e.preventDefault();
@@ -66,39 +93,17 @@ $(document).ready(function(){
         $("#compoundRate").text("Compound Rate: " + compoundRate(interestRate, numPeriods));
         let { periods, rates, balances, interests } = compound(principal, interestRate, numPeriods);
 
-        var ctx = document.getElementById("chart").getContext("2d");
-        var chart = new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: periods,
-                datasets: [
-                    {
-                        label: "Rate",
-                        data: rates
-                    },
-                    {
-                        label: "Balance",
-                        data: balances
-                    },
-                    {
-                        label: "Interest",
-                        data: interests
-                    }
-                ]
-            },
-            options: {
-                scales: {
-                    yAxes: [
-                        {
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }
-                    ]
-                }
-            }
-        });
-
+        var $charts = $("#charts").empty();
+        var $rateChart = $("<canvas id='Rate'></canvas>");
+        $charts.append($rateChart);
+        newChart($rateChart, periods, rates, "Rate");
+        var $balanceChart = $("<canvas id='Balance'></canvas>");
+        $charts.append($balanceChart);
+        newChart($balanceChart, periods, balances, "Balance");
+        var $interestChart = $("<canvas id='Interest'></canvas>");
+        $charts.append($interestChart);
+        newChart($interestChart, periods, interests, "Interest");
+        
         $table = $("<table></table>");
         $table.append("<tr><th>Period</th><th>Rate</th><th>Balance</th><th>Interest</th></tr");
         for (var i = 0; i < rates.length; i++) {
